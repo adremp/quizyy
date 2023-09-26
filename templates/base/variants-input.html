@@ -1,0 +1,32 @@
+<div hx-push-url="false">
+  <p class="text-sm">Variants</p>
+  <label
+    class="flex px-4 py-3 mb-2 text-sm font-medium border-2 rounded-md focus-within:outline outline-4 focus-within:outline-black border-neutral-300"
+  >
+    <input
+      type="text"
+      name="variant"
+      class="outline-none group grow"
+      hx-target="#variants"
+			hx-trigger="keydown[Enter]"
+    /><button
+      hx-target="#variants"
+      hx-swap="outerHTML"
+			hx-patch="/variants-input"
+			hx-include="[name='variants']"
+      class="p-1 rounded-md shrink-0 bg-neutral-300"
+    >
+      Add
+    </button></label
+  >
+  {{block "variants-input-list" .}}
+  <ul id="variants" class="flex flex-wrap gap-2">
+		<input name="variants" class="hidden" value='{{if gt (len .) 0}}{{join . ","}}{{end}}' />
+    {{ range . }} {{block "variants-input-list-item" .}}
+    <li class="flex gap-1 p-1 rounded-md bg-neutral-300">
+      <p>{{ . }}</p>
+    </li>
+    {{end}} {{ end }}
+  </ul>
+  {{end}}
+</div>

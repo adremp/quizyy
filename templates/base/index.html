@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="https://unpkg.com/htmx.org@1.9.5"></script>
+    <title>Quizyy</title>
+  </head>
+  <body
+    hx-push-url="true"
+    hx-boost="true"
+    class="flex flex-col items-center content-center h-screen overflow-hidden"
+  >
+    {{ block "body" .}} 
+		{{ template "header"}}
+    <main class="flex flex-col items-center w-full max-w-5xl overflow-y-auto">
+      {{ template "main" .}}
+    </main>
+    {{ end }}
+  </body>
+</html>

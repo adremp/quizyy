@@ -1,0 +1,12 @@
+<div class='{{ template "container"}} max-w-[30rem] p-8'>
+  <form class="space-y-4" hx-push-url="false" hx-post="/quiz">
+    {{ range .Inputs}} {{template "input.html" .}} {{end}} 
+		{{ template "variants-input.html" .Variants }}
+    <button
+      type="submit"
+      class="inline-flex items-center justify-center w-full gap-2 px-4 py-3 text-sm font-semibold text-white transition-all bg-blue-500 border border-transparent rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+    >
+      Send
+    </button>
+  </form>
+</div>
