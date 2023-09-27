@@ -1,8 +1,8 @@
 package main
 
 import (
-	db "counter/database"
-	props "counter/templates"
+	db "quizyy/database"
+	props "quizyy/templates"
 	"fmt"
 	"html/template"
 	"log"
@@ -162,53 +162,10 @@ func main() {
 		tCreate.ExecuteTemplate(c.Writer, "variants-input-list", combined)
 	})
 
-	// dataFunc := map[string]func(c *gin.Context) any{
-	// 	"create-quiz-form": func(c *gin.Context) any {
-	// 		return props.CreateQuizForm{
-	// 			Inputs:   []props.Input{{"Question", "question"}, {"Answer", "answer"}},
-	// 			Variants: []string{},
-	// 		}
-	// 	},
-	// 	"quiz-list-main": func(c *gin.Context) interface{} {
-	// 		data, err := sqlxx.GetQuizes()
-	// 		if err != nil {
-	// 			c.JSON(400, gin.H{"error": err.Error()})
-	// 			return nil
-	// 		}
-	// 		return props.QuizListMain{Quizes: data}
-	// 	},
-	// 	"quiz-main": func(c *gin.Context) any {
-	// 		data, err := sqlxx.GetQuiz(c.Query("id"))
-	// 		if err != nil {
-	// 			c.JSON(400, gin.H{"error": err.Error()})
-	// 			return nil
-	// 		}
-	// 		return props.QuizMain{data}
-	// 	},
-	// 	"variants-item": func(c *gin.Context) any {
-	// 		fmt.Print(c.Param("variant"), c.PostForm("variant"), )
-	// 		return c.Query("variant")
-	// 	},
-	// }
-
-	// r.GET("/t/:templ", func(c *gin.Context) {
-	// 	c.HTML(200, c.Param("templ")+".html", dataFunc[c.Param("templ")](c))
-	// })
-
-	// r.GET("/", func(c *gin.Context) {
-	// 	c.HTML(200, "index.html", struct{ Text, Title string }{"Home", "Home"})
-	// })
-
-	// r.POST("/post-quiz", func(c *gin.Context) {
-	// 	quiz := db.Quiz{Question: c.PostForm("question"), Answer: c.PostForm("answer")}
-	// 	if err := sqlxx.CreateQuiz(quiz); err != nil {
-	// 		c.JSON(400, gin.H{"error": err.Error()})
-	// 		return
-	// 	}
-	// 	c.HTML(200, "post-quiz-success.html", nil)
-	// })
-
-	r.Run()
+	err = r.Run(":3000")
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func CopyAndParse(temp *template.Template, files ...string) (*template.Template, error) {

@@ -2071,10 +2071,6 @@ input[type="range"]:active::-webkit-slider-thumb {
   border-radius: 0.375rem;
 }
 
-.rounded-sm {
-  border-radius: 0.125rem;
-}
-
 .rounded-xl {
   border-radius: 0.75rem;
 }
@@ -2350,11 +2346,6 @@ input[type="range"]:active::-webkit-slider-thumb {
 .bg-neutral-300 {
   --tw-bg-opacity: 1;
   background-color: rgb(212 212 212 / var(--tw-bg-opacity));
-}
-
-.bg-neutral-500 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(115 115 115 / var(--tw-bg-opacity));
 }
 
 .bg-neutral-600 {

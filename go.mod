@@ -1,4 +1,4 @@
-module counter
+module quizyy
 
 go 1.21.1
 

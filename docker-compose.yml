@@ -9,6 +9,13 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+  app:
+    container_name: quizyy
+    build: .
+    env_file: .env
+    ports:
+     - "3000:3000"
+    depends_on:
+      - pg
 volumes:
   postgres_data:

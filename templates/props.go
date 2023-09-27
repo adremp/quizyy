@@ -1,6 +1,6 @@
 package props
 
-import db "counter/database"
+import db "quizyy/database"
 
 type Success struct {
 	Title string
