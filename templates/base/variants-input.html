@@ -1,28 +1,39 @@
-<div hx-push-url="false">
-  <p class="text-sm">Variants</p>
+<div class="group" hx-push-url="false">
+  <p>Variants</p>
   <label
-    class="flex px-4 py-3 mb-2 text-sm font-medium border-2 rounded-md focus-within:outline outline-4 focus-within:outline-black border-neutral-300"
+    hx-get="/validate"
+    hx-trigger="blur from:#variants-input"
+    hx-include="[name='variants']"
+    class="flex h-12 px-2 mb-2 group-has-[._error:not(:empty)]:border-red-500 overflow-hidden border-2 rounded-md border-neutral-300"
   >
     <input
+      id="variants-input"
       type="text"
       name="variant"
-      class="outline-none group grow"
+      class="outline-none grow"
       hx-target="#variants"
-			hx-trigger="keydown[Enter]"
+      hx-trigger="keydown[Enter]"
     /><button
       hx-target="#variants"
       hx-swap="outerHTML"
-			hx-patch="/variants-input"
-			hx-include="[name='variants']"
-      class="p-1 rounded-md shrink-0 bg-neutral-300"
+      hx-include="[name='variants']"
+      hx-patch="/variants-input"
+      class="px-1 m-1 font-bold rounded-md shrink-0 bg-neutral-300"
     >
       Add
     </button></label
   >
-  {{block "variants-input-list" .}}
+  <div id="variants-error" class="empty:hidden _error">
+    {{- with .ErrorText }} {{template "text-error" .}} {{end -}}
+  </div>
+  {{block "variants-input-list" .Variants}}
   <ul id="variants" class="flex flex-wrap gap-2">
-		<input name="variants" class="hidden" value='{{if gt (len .) 0}}{{join . ","}}{{end}}' />
-    {{ range . }} {{block "variants-input-list-item" .}}
+    <input
+      name="variants"
+      class="hidden"
+      value='{{if gt (len .) 0}}{{join . ","}}{{end}}'
+    />
+    {{ range . | omitEmptyStrings }} {{block "variants-input-list-item" .}}
     <li class="flex gap-1 p-1 rounded-md bg-neutral-300">
       <p>{{ . }}</p>
     </li>

@@ -1,11 +1,13 @@
-FROM golang
+FROM golang as build
 
 WORKDIR /app
 
-COPY . .
+COPY go.* ./
+RUN go mod download
 
-RUN go build -o ./main
+COPY . .
+RUN go build -o main
 
 EXPOSE 3000:3000
 
-ENTRYPOINT ["./main"]
+ENTRYPOINT ["/app/main"]

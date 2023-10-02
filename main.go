@@ -1,15 +1,16 @@
 package main
 
 import (
-	db "quizyy/database"
-	props "quizyy/templates"
 	"fmt"
 	"html/template"
 	"log"
 	"os"
+	db "quizyy/database"
+	props "quizyy/templates"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 )
 
@@ -21,13 +22,12 @@ func init() {
 }
 
 func main() {
+	log.SetOutput(os.Stdout)
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.Static("/static", "./static")
 
-	log.SetOutput(os.Stdout)
-	gin.SetMode(gin.ReleaseMode)
-
-	t, err := template.New("").Funcs(template.FuncMap{"join": strings.Join}).ParseGlob("templates/base/*.html")
+	t, err := template.New("").Funcs(template.FuncMap{"join": strings.Join, "lowercase": strings.ToLower, "omitEmptyStrings": omitEmptyStrings}).ParseGlob("templates/base/*.html")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -94,7 +94,6 @@ func main() {
 		if quiz.Answer == answer {
 			fmt.Print("[INFO] correct")
 			c.Header("HX-Retarget", "main")
-			// idInt, err := strconv.Atoi(id)
 			if err != nil {
 				fmt.Printf("[ERROR] parse id error %s", err)
 				c.JSON(400, gin.H{"error": err.Error()})
@@ -111,8 +110,33 @@ func main() {
 		}
 	})
 
+	r.GET("/validate", func(c *gin.Context) {
+		var quiz *db.QuizInput
+		if c.ShouldBindQuery(&quiz) != nil {
+			fmt.Print("[ERROR] invalid params")
+			c.JSON(400, gin.H{"error": "invalid params"})
+			return
+		}
+
+		err := db.Validate.Struct(quiz)
+
+		for qKey := range c.Request.URL.Query() {
+			c.Header("HX-Retarget", fmt.Sprintf("#%s-error", qKey))
+			for _, err := range err.(validator.ValidationErrors) {
+				fieldLower := strings.ToLower(err.Field())
+				fmt.Printf("[INFO] validate, fieldLower: %s, tag: %s, qKey: %s", fieldLower, err.Tag(), qKey)
+				if fieldLower != qKey {
+					continue
+				}
+				tCreate.ExecuteTemplate(c.Writer, "text-error", db.QuizErrorMessages[fieldLower][err.Tag()])
+			}
+			tCreate.ExecuteTemplate(c.Writer, "nil", nil)
+			break
+		}
+	})
+
 	r.GET("/create", func(c *gin.Context) {
-		data := props.CreateQuizForm{Inputs: []props.Input{{"Question", "question"}, {"Answer", "answer"}}, Variants: []string{}}
+		data := props.CreateQuizForm{Inputs: []props.Input{{"Question", `name="question"`, ""}, {"Answer", `name="answer"`, ""}}, VariantsInput: props.VariantsInput{[]string{}, ""}}
 		c.Header("Cache-Control", "public, max-age:60")
 		if c.GetHeader("HX-Request") != "" {
 			err := tCreate.ExecuteTemplate(c.Writer, "body", data)
@@ -120,7 +144,10 @@ func main() {
 				log.Fatal(err)
 			}
 		} else {
-			tCreate.ExecuteTemplate(c.Writer, "index.html", data)
+			err = tCreate.ExecuteTemplate(c.Writer, "index.html", data)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 	})
 
@@ -142,13 +169,39 @@ func main() {
 	})
 
 	r.POST("/quiz", func(c *gin.Context) {
-		quiz := db.Quiz{Question: c.PostForm("question"), Answer: c.PostForm("answer"), Variants: strings.Split(c.PostForm("variants"), ",")}
-		if err := sqlxx.CreateQuiz(quiz); err != nil {
+		var quiz db.QuizInput
+		err := c.Bind(&quiz)
+		if err != nil {
+			fmt.Printf("[ERROR] bind quiz error %s", err)
+			c.JSON(400, gin.H{"error": err.Error()})
+			return
+		}
+
+		errs := db.Validate.Struct(&quiz)
+		errArr, ok := errs.(validator.ValidationErrors)
+		if ok {
+			fmt.Print("[ERRORS EXIST]")
+			var quizErrors = map[string]string{}
+			for _, err := range errArr {
+				fieldLower := strings.ToLower(err.Field())
+				errMess := db.QuizErrorMessages[fieldLower][err.Tag()]
+				quizErrors[fieldLower] = errMess
+			}
+			c.Header("HX-Retarget", "main")
+			tCreate.ExecuteTemplate(c.Writer, "create-quiz-form.html", props.CreateQuizForm{Inputs: []props.Input{{"Question", toHTMLAttr(map[string]string{"name": "question", "value": quiz.Question}), quizErrors["question"]}, {"Answer", toHTMLAttr(map[string]string{"name": "answer", "value": quiz.Answer}), quizErrors["answer"]}}, VariantsInput: props.VariantsInput{strings.Split(quiz.Variants, ","), quizErrors["variants"]}})
+			return
+		}
+		formatedQuiz := db.BindQuizForm(c)
+		if err := sqlxx.CreateQuiz(formatedQuiz); err != nil {
 			fmt.Errorf("[ERROR] create quiz error %s", err)
 			c.JSON(400, gin.H{"error": err.Error()})
 			return
 		}
-		t.ExecuteTemplate(c.Writer, "success.html", props.Success{Title: "Well done!", ActionText: "Go to home", ActionUrl: "/"})
+		err = tCreate.ExecuteTemplate(c.Writer, "success.html", props.Success{Title: "Well done!", ActionText: "Go to home", ActionUrl: "/"})
+		if err != nil {
+			log.Print("[ERROR]", err)
+			log.Fatal(err)
+		}
 	})
 
 	r.PATCH("/variants-input", func(c *gin.Context) {
@@ -180,4 +233,22 @@ func CopyAndParse(temp *template.Template, files ...string) (*template.Template,
 		}
 	}
 	return t, nil
+}
+
+func omitEmptyStrings(arr []string) []string {
+	var result []string
+	for _, s := range arr {
+		if s != "" {
+			result = append(result, s)
+		}
+	}
+	return result
+}
+
+func toHTMLAttr(attrs map[string]string) template.HTMLAttr {
+	var result string
+	for k, v := range attrs {
+		result += k + `="` + v + `"`
+	}
+	return template.HTMLAttr(result)
 }

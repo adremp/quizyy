@@ -1,6 +1,9 @@
 package props
 
-import db "quizyy/database"
+import (
+	"html/template"
+	db "quizyy/database"
+)
 
 type Success struct {
 	Title string
@@ -8,27 +11,21 @@ type Success struct {
 	ActionUrl string
 }
 
-type Index struct {
-	Title string
-}
-
 type Input struct {
 	Label string
-	Name  string
+	Attrs template.HTMLAttr
+	ErrorText string
+}
+type VariantsInput struct {
+	Variants []string
+	ErrorText string
 }
 
 type CreateQuizForm struct {
 	Inputs []Input
-	Variants []string
+	VariantsInput VariantsInput
 }
 
 type Quizes struct {
 	Quizes []db.Quiz
-}
-// type QuizListMain struct {
-// 	Quizes []db.Quiz
-// }
-
-type QuizMain struct {
-	db.Quiz
 }

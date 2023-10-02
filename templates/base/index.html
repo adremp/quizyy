@@ -12,11 +12,12 @@
     hx-boost="true"
     class="flex flex-col items-center content-center h-screen overflow-hidden"
   >
-    {{ block "body" .}} 
-		{{ template "header"}}
+    {{ block "body" .}} {{ template "header"}}
     <main class="flex flex-col items-center w-full max-w-5xl overflow-y-auto">
       {{ template "main" .}}
     </main>
     {{ end }}
   </body>
 </html>
+
+{{define "nil"}} {{end}}

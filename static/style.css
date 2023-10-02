@@ -674,6 +674,36 @@ input[type="range"]:active::-webkit-slider-thumb {
   }
 }
 
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.plus {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  aspect-ratio: 1;
+}
+
+.plus::before, .plus::after {
+  content: ;
+  position: absolute;
+  background-color: currentColor;
+  width: 100%;
+  height: 100%;
+}
+
+.plus::before {
+  rotate: 45deg;
+}
+
+.plus::after {
+  rotate: -45deg;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -1176,6 +1206,10 @@ input[type="range"]:active::-webkit-slider-thumb {
 
 .h-10 {
   height: 2.5rem;
+}
+
+.h-12 {
+  height: 3rem;
 }
 
 .h-14 {
@@ -2383,6 +2417,11 @@ input[type="range"]:active::-webkit-slider-thumb {
   background-color: rgb(206 219 238 / var(--tw-bg-opacity));
 }
 
+.bg-red-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(239 68 68 / var(--tw-bg-opacity));
+}
+
 .bg-transparent {
   background-color: transparent;
 }
@@ -2818,6 +2857,10 @@ input[type="range"]:active::-webkit-slider-thumb {
   text-transform: uppercase;
 }
 
+.lowercase {
+  text-transform: lowercase;
+}
+
 .normal-case {
   text-transform: none;
 }
@@ -3081,6 +3124,11 @@ input[type="range"]:active::-webkit-slider-thumb {
   color: rgb(168 85 247 / var(--tw-text-opacity));
 }
 
+.text-red-500 {
+  --tw-text-opacity: 1;
+  color: rgb(239 68 68 / var(--tw-text-opacity));
+}
+
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
@@ -3202,10 +3250,6 @@ input[type="range"]:active::-webkit-slider-thumb {
 
 .outline {
   outline-style: solid;
-}
-
-.outline-4 {
-  outline-width: 4px;
 }
 
 .blur {
@@ -3579,14 +3623,6 @@ body {
 
 .empty\:hidden:empty {
   display: none;
-}
-
-.focus-within\:outline:focus-within {
-  outline-style: solid;
-}
-
-.focus-within\:outline-black:focus-within {
-  outline-color: #000;
 }
 
 .hover\:cursor-pointer:hover {
@@ -4554,6 +4590,11 @@ body {
 .peer[data-te-input-focused] ~ .peer-data-\[te-input-focused\]\:text-primary {
   --tw-text-opacity: 1;
   color: rgb(59 113 202 / var(--tw-text-opacity));
+}
+
+.group:has(._error:not(:empty)) .group-has-\[\._error\:not\(\:empty\)\]\:border-red-500 {
+  --tw-border-opacity: 1;
+  border-color: rgb(239 68 68 / var(--tw-border-opacity));
 }
 
 :is([dir="rtl"] .rtl\:\!left-auto) {
