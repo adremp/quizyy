@@ -44,8 +44,8 @@ var (
 			"required": "Answer is required",
 		},
 		"variants": {
-			"comajoinedmin": "At least 3 variants are required",
-			"fieldcontains": "Must contain answer",
+			"comajoinedmin":  "At least 3 variants are required",
+			"fieldcontains":  "Must contain answer",
 			"comajoinedunic": "All variants must be unique",
 		},
 	}

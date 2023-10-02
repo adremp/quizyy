@@ -1,4 +1,4 @@
-FROM golang as build
+FROM golang:alpine as build
 
 WORKDIR /app
 
@@ -8,6 +8,12 @@ RUN go mod download
 COPY . .
 RUN go build -o main
 
-EXPOSE 3000:3000
+FROM golang:alpine
+COPY --from=build /app/main .
+COPY --from=build /app/.env .
+COPY --from=build /app/templates ./templates
+COPY --from=build /app/static ./static
 
-ENTRYPOINT ["/app/main"]
+EXPOSE 3000
+
+ENTRYPOINT [ "./main" ]

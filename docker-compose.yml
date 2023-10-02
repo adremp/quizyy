@@ -1,19 +1,26 @@
 version: '3.5'
 
+networks:
+  quizyy:
+
 services:
   pg:
     container_name: quizyy_postgres
     image: postgres
     env_file: .env
+    networks:
+      - quizyy
     ports:
-      - "5431:5431"
+      - "5431:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
   app:
     container_name: quizyy
-    image: xeoson/quizyy:0.1
+    build: .
     env_file: .env
+    networks:
+      - quizyy
     ports:
      - "3000:3000"
     depends_on:
